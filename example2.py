@@ -7,8 +7,25 @@
 ####
 
 team_name = 'E2'
-strategy_name = 'Start with betray, then alternate'
-strategy_description = 'Betray, then alternate every move.'
+strategy_name = 'Start with collude, collude when both players colluded last round'
+strategy_description = 'Collude, then collude when both of us colluded last round. Otherwise, look at previous rounds and copy what they did in the same situation. If the previous rounds result never has happened, collude except after being severly punished.'
+
+def probability_that_other_player_will_betray(my_history, their_history, my_score, their_score):
+  their_previous_round = their_history[-1]
+  my_previous_round = my_history[-1]
+  
+# Look at rounds before that one
+  for round in range(len(my_history)-1):
+    their_prior_round = their_history[round]
+    my_prior_round = my_history[round]
+    # If one matches
+    if (my_prior_round == my_previous_round) and (their_prior_round == their_previous_round):
+      return their_history[round]
+      # No match found
+  if my_history[-1]=='c' and their_history[-1]=='b':
+    return 'b' # Betray if we were severely punished last time.
+  else:
+    return 'c' # Otherwise collude.
     
 def move(my_history, their_history, my_score, their_score):
   '''Make my move based on the history with this player.
@@ -20,9 +37,10 @@ def move(my_history, their_history, my_score, their_score):
   
   Returns 'c' or 'b' for collude or betray.
   '''
-  # This player colludes on even numbered rounds (first round is round #0).
-  if len(my_history)%2 == 0:
-    return 'b'
+  # Collude on first round
+  if len(my_history) % 2 == 0:
+    return 'c'
+  elif my_history[-1]=='c' and their_history[-1]=='c':
+    return 'c' # collude if we both colluded last move.
   else:
-   return 'c'
-  
+    probability_that_other_player_will_betray(my_history, their_history, my_score, their_score) # Otherwise look at previous rounds and copy what they did in the same situation.

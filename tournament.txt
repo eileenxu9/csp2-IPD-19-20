@@ -3,17 +3,18 @@ Section 0 - Line up
 --------------------------------------------------------------------------------
 Player 0 (P0): E0, Betray when other player betrayed
         Betray first. Betray when other players last move was betray. Otherwise,
-         compare all rounds to the previous round and assume opponent will behav
-        e the same as the first time the previous rounds result occurred. If the
-         previous rounds result never has happened, betray except after being se
-        verely punished.
+         look at previous rounds and copy what they did in the same situation. I
+        f the previous rounds result never has happened, collude except after be
+        ing severly punished.
 Player 1 (P1): E1, Betray if severely punished last round
-        Betray first round. Compare all rounds to the previous round and assume 
-        opponent will behave the same as the first time the previous rounds resu
-        lt occurred. If the previous rounds result never has happened, collude e
-        xcept after being severly punished.
-Player 2 (P2): E2, Start with betray, then alternate
-        Betray, then alternate every move.
+        Betray first round. Otherwise, look at previous rounds and copy what the
+        y did in the same situation. If the previous rounds result never has hap
+        pened, collude except after being severly punished.
+Player 2 (P2): E2, Start with collude, collude when both players colluded last round
+        Collude, then collude when both of us colluded last round. Otherwise, lo
+        ok at previous rounds and copy what they did in the same situation. If t
+        he previous rounds result never has happened, collude except after being
+         severly punished.
 Player 3 (P3): E3, Collude but retaliate
         Collude first round. Collude, except in a round after getting 
         a severe punishment.
@@ -22,20 +23,20 @@ Section 1 - Player vs. Player
 --------------------------------------------------------------------------------
 Each column shows pts//round earned against each other player:
              P0     P1     P2     P3
-vs. P0 :      0   -250   -375   -376
-vs. P1 :   -250      0   -250   -252
-vs. P2 :    -77   -250      0   -203
-vs. P3 :    -74   -249   -198      0
-TOTAL  :   -401   -749   -823   -831
+vs. P0 :      0   -250   -252   -376
+vs. P1 :   -250      0   -252   -252
+vs. P2 :   -248   -248      0      0
+vs. P3 :    -74   -248      0      0
+TOTAL  :   -572   -746   -504   -628
 --------------------------------------------------------------------------------
 Section 2 - Leaderboard
 --------------------------------------------------------------------------------
 Average points per round:
 Team name (P#):  Score      with strategy name
-E0        (P0):       -101 points with Betray when other player betrayed       
-E1        (P1):       -188 points with Betray if severely punished last round  
-E2        (P2):       -206 points with Start with betray, then alternate       
-E3        (P3):       -208 points with Collude but retaliate                   
+E2        (P2):       -126 points with Start with collude, collude when both pl
+E0        (P0):       -143 points with Betray when other player betrayed       
+E3        (P3):       -157 points with Collude but retaliate                   
+E1        (P1):       -187 points with Betray if severely punished last round  
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 example0--------------------------------------------------------------------------------
@@ -49,7 +50,7 @@ example0------------------------------------------------------------------------
 
 team_name = 'E0'
 strategy_name = 'Betray when other player betrayed'
-strategy_description = 'Betray first. Betray when other players last move was betray. Otherwise, compare all rounds to the previous round and assume opponent will behave the same as the first time the previous rounds result occurred. If the previous rounds result never has happened, betray except after being severely punished.'
+strategy_description = 'Betray first. Betray when other players last move was betray. Otherwise, look at previous rounds and copy what they did in the same situation. If the previous rounds result never has happened, collude except after being severly punished.'
 
 def probability_that_other_player_will_betray(my_history, their_history, my_score, their_score):
   their_previous_round = their_history[-1]
@@ -64,9 +65,9 @@ def probability_that_other_player_will_betray(my_history, their_history, my_scor
       return their_history[round]
         # No match found
   if my_history[-1]=='c' and their_history[-1]=='b':
-    return 'b' # Collude if we were severely punished last time.
+    return 'b' # Betray if we were severely punished last time.
   else:
-    return 'c' # Otherwise betray.
+    return 'c' # Otherwise collude.
 
 def move(my_history, their_history, my_score, their_score):
   '''Make my move based on the history with this player.
@@ -83,8 +84,7 @@ def move(my_history, their_history, my_score, their_score):
   elif their_history[-1]=='b':
     return 'b' # Betray if their last move was betray.
   else:
-    probability_that_other_player_will_betray(my_history, their_history, my_score, their_score) # otherwise call probability_that_other_player_will_betray() function
-    --------------------------------------------------------------------------------
+    probability_that_other_player_will_betray(my_history, their_history, my_score, their_score) # otherwise call probability_that_other_player_will_betray() function--------------------------------------------------------------------------------
 example1--------------------------------------------------------------------------------
 ####
 # Each team's file must define four tokens:
@@ -96,7 +96,7 @@ example1------------------------------------------------------------------------
 
 team_name = 'E1'
 strategy_name = 'Betray if severely punished last round'
-strategy_description = 'Betray first round. Compare all rounds to the previous round and assume opponent will behave the same as the first time the previous rounds result occurred. If the previous rounds result never has happened, collude except after being severly punished.'
+strategy_description = 'Betray first round. Otherwise, look at previous rounds and copy what they did in the same situation. If the previous rounds result never has happened, collude except after being severly punished.'
 
 def probability_that_other_player_will_betray(my_history, their_history, my_score, their_score):
   their_previous_round = their_history[-1]
@@ -130,9 +130,7 @@ def move(my_history, their_history, my_score, their_score):
   '''
   if len(my_history)==0: # It's the first round; betray.
     return 'b'
-  probability_that_other_player_will_betray(my_history, their_history, my_score, their_score)
-  
---------------------------------------------------------------------------------
+  probability_that_other_player_will_betray(my_history, their_history, my_score, their_score)--------------------------------------------------------------------------------
 example2--------------------------------------------------------------------------------
 ####
 # Each team's file must define four tokens:
@@ -143,8 +141,25 @@ example2------------------------------------------------------------------------
 ####
 
 team_name = 'E2'
-strategy_name = 'Start with betray, then alternate'
-strategy_description = 'Betray, then alternate every move.'
+strategy_name = 'Start with collude, collude when both players colluded last round'
+strategy_description = 'Collude, then collude when both of us colluded last round. Otherwise, look at previous rounds and copy what they did in the same situation. If the previous rounds result never has happened, collude except after being severly punished.'
+
+def probability_that_other_player_will_betray(my_history, their_history, my_score, their_score):
+  their_previous_round = their_history[-1]
+  my_previous_round = my_history[-1]
+  
+# Look at rounds before that one
+  for round in range(len(my_history)-1):
+    their_prior_round = their_history[round]
+    my_prior_round = my_history[round]
+    # If one matches
+    if (my_prior_round == my_previous_round) and (their_prior_round == their_previous_round):
+      return their_history[round]
+      # No match found
+  if my_history[-1]=='c' and their_history[-1]=='b':
+    return 'b' # Betray if we were severely punished last time.
+  else:
+    return 'c' # Otherwise collude.
     
 def move(my_history, their_history, my_score, their_score):
   '''Make my move based on the history with this player.
@@ -156,11 +171,13 @@ def move(my_history, their_history, my_score, their_score):
   
   Returns 'c' or 'b' for collude or betray.
   '''
-  # This player colludes on even numbered rounds (first round is round #0).
-  if len(my_history)%2 == 0:
-    return 'b'
+  # Collude on first round
+  if len(my_history) % 2 == 0:
+    return 'c'
+  elif my_history[-1]=='c' and their_history[-1]=='c':
+    return 'c' # collude if we both colluded last move.
   else:
-   return 'c'
+    probability_that_other_player_will_betray(my_history, their_history, my_score, their_score) # Otherwise look at previous rounds and copy what they did in the same situation.
   --------------------------------------------------------------------------------
 example3--------------------------------------------------------------------------------
 ####
@@ -200,17 +217,17 @@ Section 3 - Game Data for Team E0
 bb                                                                              
 b                                                                               
 
-                                                      
-                                                      
+                                                                                
+                                                                                
 
 --------------------------------------------------------------------------------
--77 pt//round: E0(P0) "Betray when other player betrayed"
--375 pt//ound: E2(P2) "Start with betray, then alternate"
-bB B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
-bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+-248 pt//round: E0(P0) "Betray when other player betrayed"
+-252 pt//ound: E2(P2) "Start with collude, collude when both players colluded last round"
+B                                                                               
+c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c 
 
- B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B 
-bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
+                                             
+c c c c c c c c c c c c c c c c c c c c c c c
 
 --------------------------------------------------------------------------------
 -74 pt//round: E0(P0) "Betray when other player betrayed"
@@ -218,8 +235,8 @@ bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
 B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B 
 cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
 
-B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
-cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+B B B B B B B B B B B B B B B B B B B B B B B B B B
+cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -230,65 +247,62 @@ Section 3 - Game Data for Team E1
 b                                                                               
 bb                                                                              
 
-                                                      
-                                                      
+                                                                                
+                                                                                
 
 --------------------------------------------------------------------------------
--250 pt//round: E1(P1) "Betray if severely punished last round"
--250 pt//ound: E2(P2) "Start with betray, then alternate"
-b                                                                               
-bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+-248 pt//round: E1(P1) "Betray if severely punished last round"
+-252 pt//ound: E2(P2) "Start with collude, collude when both players colluded last round"
+B                                                                               
+c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c 
 
                                                                                 
-bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c 
 
-                  
-bcbcbcbcbcbcbcbcbc
+            
+c c c c c c 
 
 --------------------------------------------------------------------------------
--249 pt//round: E1(P1) "Betray if severely punished last round"
+-248 pt//round: E1(P1) "Betray if severely punished last round"
 -252 pt//ound: E3(P3) "Collude but retaliate"
 B                                                                               
 cbcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-                                                                                
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-                                   
-ccccccccccccccccccccccccccccccccccc
+                                                        
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 Section 3 - Game Data for Team E2
 --------------------------------------------------------------------------------
--375 pt//round: E2(P2) "Start with betray, then alternate"
--77 pt//ound: E0(P0) "Betray when other player betrayed"
-bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
-bB B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+-252 pt//round: E2(P2) "Start with collude, collude when both players colluded last round"
+-248 pt//ound: E0(P0) "Betray when other player betrayed"
+c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c 
+B                                                                               
 
-bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
- B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B 
+c c c c c c c c c c c c c c c c c c c c c c c
+                                             
 
 --------------------------------------------------------------------------------
--250 pt//round: E2(P2) "Start with betray, then alternate"
--250 pt//ound: E1(P1) "Betray if severely punished last round"
-bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
-b                                                                               
+-252 pt//round: E2(P2) "Start with collude, collude when both players colluded last round"
+-248 pt//ound: E1(P1) "Betray if severely punished last round"
+c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c 
+B                                                                               
 
-bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c 
                                                                                 
 
-bcbcbcbcbcbcbcbcbc
-                  
+c c c c c c 
+            
 
 --------------------------------------------------------------------------------
--198 pt//round: E2(P2) "Start with betray, then alternate"
--203 pt//ound: E3(P3) "Collude but retaliate"
-BcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBc
-cBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcB
+0 pt//round: E2(P2) "Start with collude, collude when both players colluded last round"
+0 pt//ound: E3(P3) "Collude but retaliate"
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-BcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcB
-cBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBc
+CCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCC
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -299,28 +313,25 @@ Section 3 - Game Data for Team E3
 cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcb
 B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B 
 
-cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
-B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+cbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc
+B B B B B B B B B B B B B B B B B B B B B B B B B B
 
 --------------------------------------------------------------------------------
 -252 pt//round: E3(P3) "Collude but retaliate"
--249 pt//ound: E1(P1) "Betray if severely punished last round"
+-248 pt//ound: E1(P1) "Betray if severely punished last round"
 cbcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 B                                                                               
 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-                                                                                
-
-ccccccccccccccccccccccccccccccccccc
-                                   
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+                                                        
 
 --------------------------------------------------------------------------------
--203 pt//round: E3(P3) "Collude but retaliate"
--198 pt//ound: E2(P2) "Start with betray, then alternate"
-cBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcB
-BcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBc
+0 pt//round: E3(P3) "Collude but retaliate"
+0 pt//ound: E2(P2) "Start with collude, collude when both players colluded last round"
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-cBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBc
-BcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcBcB
+CCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCCCCCCCCCCCC
 
 --------------------------------------------------------------------------------

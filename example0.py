@@ -8,7 +8,7 @@
 
 team_name = 'E0'
 strategy_name = 'Betray when other player betrayed'
-strategy_description = 'Betray first. Betray when other players last move was betray. Otherwise, compare all rounds to the previous round and assume opponent will behave the same as the first time the previous rounds result occurred. If the previous rounds result never has happened, betray except after being severely punished.'
+strategy_description = 'Betray first. Betray when other players last move was betray. Otherwise, look at previous rounds and copy what they did in the same situation. If the previous rounds result never has happened, collude except after being severly punished.'
 
 def probability_that_other_player_will_betray(my_history, their_history, my_score, their_score):
   their_previous_round = their_history[-1]
@@ -43,4 +43,3 @@ def move(my_history, their_history, my_score, their_score):
     return 'b' # Betray if their last move was betray.
   else:
     probability_that_other_player_will_betray(my_history, their_history, my_score, their_score) # otherwise call probability_that_other_player_will_betray() function
-    

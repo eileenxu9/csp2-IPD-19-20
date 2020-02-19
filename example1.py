@@ -8,7 +8,7 @@
 
 team_name = 'E1'
 strategy_name = 'Betray if severely punished last round'
-strategy_description = 'Betray first round. Compare all rounds to the previous round and assume opponent will behave the same as the first time the previous rounds result occurred. If the previous rounds result never has happened, collude except after being severly punished.'
+strategy_description = 'Betray first round. Otherwise, look at previous rounds and copy what they did in the same situation. If the previous rounds result never has happened, collude except after being severly punished.'
 
 def probability_that_other_player_will_betray(my_history, their_history, my_score, their_score):
   their_previous_round = their_history[-1]
@@ -43,4 +43,3 @@ def move(my_history, their_history, my_score, their_score):
   if len(my_history)==0: # It's the first round; betray.
     return 'b'
   probability_that_other_player_will_betray(my_history, their_history, my_score, their_score)
-  
